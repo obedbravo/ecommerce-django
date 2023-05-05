@@ -130,8 +130,24 @@ STATICFILES_DIRS = [
     'ecommerce/static'
 ]
 
+
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR /'media'
+
+#importando mensages de error o de completado
+from django.contrib.messages import constants as messeges
+
+MESSAGE_TAGS = {
+    messeges.ERROR : 'danger',
+}
+
+#DATOS PARA EL CORREO PRINCIPAL QUE ENVIARA LA CONFIRMACION DE ACTIVACION CUENTA, PARA LOS USUARIOS.
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'obedbravobarajas8397@gmail.com'
+EMAIL_HOST_PASSWORD = 'ckzwihrupyacqmin'
+EMAIL_USE_TLS = True
 
 #MEDIA_URL = '/media'
 #MEDIA_ROOT = BASE_DIR /'media'

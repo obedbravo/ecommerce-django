@@ -5,6 +5,7 @@ from category.models import Category
 from carts.models import CartItem
 from carts.views import _cart_id
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.db.models import Q
 
 # Create your views here, funcion de todos los productos por categoria
 def store(request, category_slug=None): # trae todos los productos, pero si existe categoria, entonces extrae todo los productos que sean de la categoria.
@@ -14,13 +15,13 @@ def store(request, category_slug=None): # trae todos los productos, pero si exis
 
     if category_slug != None:
         categories = get_object_or_404(Category, slug=category_slug)
-        products = Product.objects.filter(category=categories, is_available=True)
+        products = Product.objects.filter(category=categories, is_available=True).order_by('id')
         paginator = Paginator(products, 5) #muestrame solo 5 productos en la pagina en grupos de 5 por pagina
         page = request.GET.get('page') #traeme la pagina que esta en el browser actulmente ahora se a que pagina quiere entrar el cliente, ya que como son de grupos puedes estar en la 1, 2, 3, 4, 5 depende en el grupo de 5 que este el producto. tre el dato de la pagina numero
         paged_products = paginator.get_page(page) #ahora paginator tiene los productos y los vamos a mandar a treaer
         product_count = products.count()
     else:
-        products = Product.objects.all().filter(is_available=True)
+        products = Product.objects.all().filter(is_available=True).order_by('id')
         paginator = Paginator(products, 5) #muestrame solo 5 productos en la pagina en grupos de 5
         page = request.GET.get('page') #traeme la pagina que esta en el browser actulmente ahora se a que pagina quiere entrar el cliente.
         paged_products = paginator.get_page(page) #ahora paginator tiene los productos y los vamos a mandar a treaer los productos por pagina en la que se encunetre por eso hacemos la instancia de paginator.get_page.
@@ -48,3 +49,17 @@ def product_detail(request, category_slug, product_slug):
     }
 
     return render(request, 'store/product_detail.html', context)
+
+def search(request):
+    if 'keyword' in request.GET:
+        keyword = request.GET['keyword']
+        if keyword:
+            products = Product.objects.order_by('-created_date').filter(Q(description__icontains=keyword) | Q(product_name__icontains=keyword) )
+            products_count = products.count()
+    
+    context = {
+        'products': products,
+        'products_count': products_count
+    }
+    
+    return render(request, 'store/store.html', context)

@@ -1,5 +1,6 @@
 from django.db import models
-from store.models import Product  #se imporat el modelo producto
+from store.models import Product, Variation #se imporat el modelo producto
+from accounts.models import Account
 # Create your models here.
 
 class Cart(models.Model): #carrito contador
@@ -12,8 +13,10 @@ class Cart(models.Model): #carrito contador
 
 
 class CartItem(models.Model):  #productos del carrito de compras agregado
+    user = models.ForeignKey(Account, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    variation = models.ManyToManyField(Variation, blank=True) #SE AÑADIO OTRO CAMPO DE COLLECION PARA LOS VARIANTES TALLA Y  COLOR
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True)
     quantity = models.IntegerField()
     is_active = models.BooleanField(default=True)
 

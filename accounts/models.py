@@ -9,10 +9,10 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 class MyAccountManager(BaseUserManager):
     def create_user(self, first_name, last_name, username, email, password=None):
         if not email:
-            raise ValueError('el usuario debe de tener un email')
+            raise ValueError('El usuario debe de tener un email')
         
         if not username:
-            raise ValueError('el usuario debe tener un username')
+            raise ValueError('El usuario debe tener un username')
 
         user = self.model(
             email = self.normalize_email(email),
@@ -23,6 +23,10 @@ class MyAccountManager(BaseUserManager):
 
 #guarda en la db
         user.set_password(password)
+        user.is_admin = False
+        user.is_active = False
+        user.is_staff = False
+        user.is_superadmin = False
         user.save(using=self._db)
         return user
 
@@ -52,13 +56,14 @@ class Account(AbstractBaseUser):
     last_name = models.CharField(max_length=50)
     username = models.CharField(max_length=50, unique=True)
     email = models.CharField(max_length=100, unique=True)
+    phone_number = models.CharField(max_length=50)
 
 #Campos atributos de django
     date_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now_add=True)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
-    is_active: models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
     is_superadmin = models.BooleanField(default=False)
 
 #requisitos por email, nombre y apellido
