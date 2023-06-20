@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'accounts',
     'store',
     'carts',
+    'orders',
 ]
 
 MIDDLEWARE = [
@@ -143,10 +144,10 @@ MESSAGE_TAGS = {
 }
 
 #DATOS PARA EL CORREO PRINCIPAL QUE ENVIARA LA CONFIRMACION DE ACTIVACION CUENTA, PARA LOS USUARIOS.
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'obedbravobarajas8397@gmail.com'
-EMAIL_HOST_PASSWORD = 'ckzwihrupyacqmin'
+EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
+EMAIL_PORT = '2525'
+EMAIL_HOST_USER = 'dbc717b0b8f544'
+EMAIL_HOST_PASSWORD = '50131c1017d4f1'
 EMAIL_USE_TLS = True
 
 #MEDIA_URL = '/media'

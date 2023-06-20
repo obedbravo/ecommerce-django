@@ -36,28 +36,29 @@ def add_cart(request, product_id): #Clase principal para obetenr el producto ele
        
 
         is_cart_item_exists = CartItem.objects.filter(product=product, user=current_user).exists()
+
         if  is_cart_item_exists:
-            cart_item = CartItem.objects.filter(product=product, user=current_user)
+                cart_item = CartItem.objects.filter(product=product, user=current_user)
 
-            ext_var_list = []
-            id = []
-            for item in cart_item:
-                existing_variation = item.variation.all()
-                ext_var_list.append(list(existing_variation)) 
-                id.append(item.id)
+                ext_var_list = []
+                id = []
+                for item in cart_item:
+                    existing_variation = item.variation.all()
+                    ext_var_list.append(list(existing_variation)) 
+                    id.append(item.id)
 
-            if product_variation in ext_var_list:
-                index = ext_var_list.index(product_variation)
-                item_id = id[index]
-                item = CartItem.objects.get(product=product, id=item_id)
-                item.quantity += 1
-                item.save()
-            else:
-                item = CartItem.objects.create(product=product, quantity=1, user=current_user)
-                if len(product_variation) > 0:
-                    item.variation.clear()
-                    item.variation.add(*product_variation)
-                item.save()
+                if product_variation in ext_var_list:
+                    index = ext_var_list.index(product_variation)
+                    item_id = id[index]
+                    item = CartItem.objects.get(product=product, id=item_id)
+                    item.quantity += 1
+                    item.save()
+                else:
+                    item = CartItem.objects.create(product=product, quantity=1, user=current_user)
+                    if len(product_variation) > 0:
+                        item.variation.clear()
+                        item.variation.add(*product_variation)
+                    item.save()
         else:
             cart_item = CartItem.objects.create(
                 product = product,
@@ -65,8 +66,10 @@ def add_cart(request, product_id): #Clase principal para obetenr el producto ele
                 user = current_user,
             )
             if len(product_variation) > 0:
+                cart_item.variation.clear()
                 cart_item.variation.add(*product_variation)
             cart_item.save()
+
         return redirect('cart')
 #--------------------------------------------si no existe sesion entonces--------------
     else:
@@ -94,27 +97,27 @@ def add_cart(request, product_id): #Clase principal para obetenr el producto ele
 
         is_cart_item_exists = CartItem.objects.filter(product=product, cart=cart).exists()
         if  is_cart_item_exists:
-            cart_item = CartItem.objects.filter(product=product, cart=cart)
+                cart_item = CartItem.objects.filter(product=product, cart=cart)
 
-            ext_var_list = []
-            id = []
-            for item in cart_item:
-                existing_variation = item.variation.all()
-                ext_var_list.append(list(existing_variation)) 
-                id.append(item.id)
+                ext_var_list = []
+                id = []
+                for item in cart_item:
+                    existing_variation = item.variation.all()
+                    ext_var_list.append(list(existing_variation)) 
+                    id.append(item.id)
 
-            if product_variation in ext_var_list:
-                index = ext_var_list.index(product_variation)
-                item_id = id[index]
-                item = CartItem.objects.get(product=product, id=item_id)
-                item.quantity += 1
-                item.save()
-            else:
-                item = CartItem.objects.create(product=product, quantity=1, cart=cart)
-                if len(product_variation) > 0:
-                    item.variation.clear()
-                    item.variation.add(*product_variation)
-                item.save()
+                if product_variation in ext_var_list:
+                    index = ext_var_list.index(product_variation)
+                    item_id = id[index]
+                    item = CartItem.objects.get(product=product, id=item_id)
+                    item.quantity += 1
+                    item.save()
+                else:
+                    item = CartItem.objects.create(product=product, quantity=1, cart=cart)
+                    if len(product_variation) > 0:
+                        item.variation.clear()
+                        item.variation.add(*product_variation)
+                    item.save()
         else:
             cart_item = CartItem.objects.create(
                 product = product,
@@ -122,6 +125,7 @@ def add_cart(request, product_id): #Clase principal para obetenr el producto ele
                 cart = cart,
             )
             if len(product_variation) > 0:
+                cart_item.variation.clear()
                 cart_item.variation.add(*product_variation)
             cart_item.save()
         return redirect('cart')
@@ -170,11 +174,12 @@ def cart(request, total=0, quantity=0, cart_items=None):  #Suma total de nuestro
     grand_total = 0
     try:
         if request.user.is_authenticated:
-            cart_items = CartItem.objects.filter(user=request.user, is_active=True)
+            cart_items = CartItem.objects.filter(user=request.user,  is_active=True)
+
         else:
             cart = Cart.objects.get(cart_id=_cart_id(request))
-            cart_items = CartItem.objects.filter(cart=cart, is_active=True)
-
+            cart_items = CartItem.objects.filter(cart=cart,  is_active=True)
+        
         for cart_item in cart_items:
             total += (cart_item.product.price * cart_item.quantity)
             quantity += cart_item.quantity

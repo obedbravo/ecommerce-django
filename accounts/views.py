@@ -62,7 +62,6 @@ def register(request):
 
 #--------------------------------------------LOGIN------------------------------------------------
 def login(request):
-
      if request.method == 'POST':
           email = request.POST['email']
           password = request.POST['password']
@@ -70,63 +69,65 @@ def login(request):
           user = auth.authenticate(email=email, password=password)
 
           if user is not None:
+
                try:
-                    cart = Cart.objects.get(cart_id=_cart_id(request))
-                    is_cart_item_exist = CartItem.objects.filter(cart=cart).exists()
-                    if is_cart_item_exist:
+                    cart = Cart.objects.get(cart_id= _cart_id(request))
+                    is_cart_item_exists = CartItem.objects.filter(cart=cart).exists()
+                    if is_cart_item_exists:
                          cart_item = CartItem.objects.filter(cart=cart)
 
-                         product_variation = []
-                         for item in  cart_item:
-                              variation = item.variation.all()
-                              product_variation.append(list(variation))
-                         
+                         product_variations = []
+                         for item in cart_item:
+                             variation =  item.variation.all()
+                             product_variations.append(list(variation))
+
                          cart_item = CartItem.objects.filter(user=user)
                          ex_var_list = []
-                         id =[]
+                         id = []
                          for item in cart_item:
                               existing_variation = item.variation.all()
-                              ex_var_list.append(existing_variation)
+                              ex_var_list.append(list(existing_variation))
                               id.append(item.id)
                          
-                         #comparacion si hay variations igualitos entra user y id inicio de sesio y no
-                         for pr in ex_var_list:
-                              if pr in product_variation:
-                                   index = product_variation.index[pr]
+
+                         #comparacion
+                         for pr in product_variations:
+                              if pr in ex_var_list:
+                                   index = ex_var_list.index(pr)
                                    item_id = id[index]
                                    item = CartItem.objects.get(id=item_id)
-                                   item.quantity += 1
+                                   item.quantity +=1
                                    item.user = user
                                    item.save()
                               else:
                                    cart_item = CartItem.objects.filter(cart=cart)
-                                   for item in cart_item:          
+                                   for item in cart_item:
                                         item.user = user
                                         item.save()
                except:
                     pass
-            
+
+                
                auth.login(request, user)
-               messages.success(request, 'Entro en sesion con exito!')
+               messages.success(request, 'Has iniciado sesion exitosamente')
 
-               url = request.META.get('HTTP_REFERER')  #-->  http://localhost:8000/accounts/login/?next=/cart/checkout/
+               #http://localhost:8000/accounts/login/?next=/cart/checkout/
+               url = request.META.get('HTTP_REFERER')
                try:
-                    query = requests.utils.urlparse(url).query  #----> ?next=/cart/checkout/
-
-                    params = dict(x.split('=') for x in query.split('&')) 
+                    query = requests.utils.urlparse(url).query
+                    #?next=/cart/checkout/
+                    params = dict(x.split('=') for x in  query.split('&'))
                     if 'next' in params:
                          nextPage = params['next']
                          return redirect(nextPage)
-                    
                except:
-                  return redirect('dashboard')
+                    return redirect('dashboard')
+
           else:
                messages.error(request, 'Las credenciales son incorrectas')
                return redirect('login')
-
-
+     
      return render(request, 'accounts/login.html')
-
 #-------------------------------LOGOUT------------------------------------------------------------
 
 @login_required(login_url='login') #esta funcion solo es activa cuando el usuario esta en sesion.
