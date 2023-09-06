@@ -9,8 +9,12 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+#imrpotamos la liberia python-decouple para crear seguirdad en nuestros datos y seguridad en la app
 from pathlib import Path
+from decouple import config
+
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-lks#ahlyr$62$3t+d&9$(fo^bc*z8uuqcfppwi&$j4*xuxnz5e'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', cast=bool, default=True)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['http://ecommerce-env.eba-erdm4yav.us-west-2.elasticbeanstalk.com/']
 
 
 # Application definition
@@ -42,6 +46,8 @@ INSTALLED_APPS = [
     'store',
     'carts',
     'orders',
+    'admin_honeypot', 
+    
 ]
 
 MIDDLEWARE = [
@@ -52,7 +58,17 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_session_timeout.middleware.SessionTimeoutMiddleware',
 ]
+
+# se le da el tiempo en el que puede expirar una sesion
+# Tiempo de expiración de sesión en segundos (por defecto, 1800 segundos = 30 minutos)
+SESSION_EXPIRE_SECONDS = 20
+
+SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
+
+SESSION_TIMEOUT_REDIRECT = 'accounts/login'
+
 
 ROOT_URLCONF = 'ecommerce.urls'
 
@@ -144,11 +160,11 @@ MESSAGE_TAGS = {
 }
 
 #DATOS PARA EL CORREO PRINCIPAL QUE ENVIARA LA CONFIRMACION DE ACTIVACION CUENTA, PARA LOS USUARIOS.
-EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
-EMAIL_PORT = '2525'
-EMAIL_HOST_USER = 'dbc717b0b8f544'
-EMAIL_HOST_PASSWORD = '50131c1017d4f1'
-EMAIL_USE_TLS = True
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
 
 #MEDIA_URL = '/media'
 #MEDIA_ROOT = BASE_DIR /'media'

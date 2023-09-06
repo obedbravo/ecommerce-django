@@ -1,7 +1,7 @@
 from msilib.schema import Class
-from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-
+from django.db import models
+from django.conf import settings
 
 
 # Create your models here.
@@ -72,6 +72,10 @@ class Account(AbstractBaseUser):
 
 #creamos la instancia de la clase para poder usarla
     objects =  MyAccountManager()
+
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
+    
 #se visualizara el email en admin django
     def __str__(self):
         return self.email
@@ -81,3 +85,18 @@ class Account(AbstractBaseUser):
 # si es administrador super usuario que tenga permisos de editar los modulos y que retorne true
     def has_module_perms(self, add_label):
         return True
+    
+class UserProfile(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    address_line_1 = models.CharField(blank=True, max_length=100)
+    address_line_2 = models.CharField(blank=True, max_length=100)
+    profile_picture = models.ImageField(blank=True, upload_to='userprofile')
+    city = models.CharField(blank=True, max_length=20)
+    state = models.CharField(blank=True, max_length=20)
+    country = models.CharField(blank=True, max_length=20)
+
+    def __str__(self):
+        return self.user.username
+
+    def full_address(self):
+        return f'{self.address_line_1} {self.address_line_2}'
